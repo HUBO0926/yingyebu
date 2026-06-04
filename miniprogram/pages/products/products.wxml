@@ -1,0 +1,22 @@
+<view class="page">
+  <input class="input" placeholder="{{copy.search}}" value="{{keyword}}" bindinput="onSearch" />
+  <scroll-view scroll-x class="tabs">
+    <text
+      wx:for="{{categories}}"
+      wx:key="id"
+      class="tab {{activeCategoryId === item.id ? 'active' : ''}}"
+      data-id="{{item.id}}"
+      bindtap="chooseCategory"
+    >{{item.name}}</text>
+  </scroll-view>
+  <view wx:if="{{usingMock}}" class="offline-tip">{{copy.offline}}</view>
+  <view wx:if="{{!filtered.length}}" class="empty">{{copy.empty}}</view>
+  <view wx:for="{{filtered}}" wx:key="id" class="product panel" data-id="{{item.id}}" bindtap="goDetail">
+    <image class="product-img" src="{{item.imageUrl}}" mode="aspectFill" />
+    <view class="product-info">
+      <view class="mini-title">{{item.name}}</view>
+      <view class="muted">{{item.model}} · {{item.categoryName}}</view>
+      <view class="summary">{{item.summary}}</view>
+    </view>
+  </view>
+</view>

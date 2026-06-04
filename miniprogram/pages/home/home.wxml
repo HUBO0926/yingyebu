@@ -1,0 +1,45 @@
+<view class="page">
+  <view class="hero panel">
+    <view class="hero-copy">
+      <text class="eyebrow">{{copy.eyebrow}}</text>
+      <text class="title">{{copy.title}}</text>
+      <text class="subtitle">{{copy.subtitle}}</text>
+    </view>
+    <view class="hero-actions">
+      <button class="primary-btn" bindtap="goInquiry">{{copy.inquiry}}</button>
+      <button class="ghost-btn" bindtap="goAi">{{copy.ai}}</button>
+    </view>
+  </view>
+
+  <view wx:if="{{usingMock}}" class="offline-tip">{{copy.offline}}</view>
+
+  <view class="panel">
+    <view class="section-title">{{copy.solutionCenter}}</view>
+    <view class="chips">
+      <text wx:for="{{home.industries}}" wx:key="*this" class="chip">{{item}}</text>
+    </view>
+  </view>
+
+  <view class="section-title">
+    <text>{{copy.productCenter}}</text>
+    <text class="link" bindtap="goProducts">{{copy.viewAll}}</text>
+  </view>
+  <view class="grid">
+    <view wx:for="{{home.products}}" wx:key="id" class="mini-card" data-id="{{item.id}}" bindtap="goProducts">
+      <image class="card-image" src="{{item.imageUrl}}" mode="aspectFill" />
+      <view class="mini-title">{{item.name}}</view>
+      <view class="muted">{{item.model}}</view>
+    </view>
+  </view>
+
+  <view class="section-title">
+    <text>{{copy.cases}}</text>
+    <text class="link" bindtap="goCases">{{copy.viewCases}}</text>
+  </view>
+  <view wx:for="{{home.cases}}" wx:key="id" class="case-card panel" bindtap="goCases">
+    <image class="card-image" src="{{item.imageUrl}}" mode="aspectFill" />
+    <view class="mini-title">{{item.name}}</view>
+    <view class="muted">{{item.location}} · {{item.industry}}</view>
+    <view class="case-summary">{{item.summary}}</view>
+  </view>
+</view>

@@ -1,0 +1,215 @@
+<view class="page quote-page">
+  <view class="quote-hero">
+    <view>
+      <view class="hero-kicker">{{copy.heroKicker}}</view>
+      <view class="hero-title">{{copy.heroTitle}}</view>
+      <view class="hero-subtitle">{{copy.heroSubtitle}}</view>
+    </view>
+    <view class="hero-total">
+      <text>{{copy.amountDue}}</text>
+      <strong>{{copy.currency}}{{totals.finalAmount}}</strong>
+    </view>
+  </view>
+
+  <view class="panel">
+    <view class="section-title compact">{{copy.customer}}</view>
+    <input class="input" placeholder="{{copy.contactName}}" data-field="customerName" value="{{form.customerName}}" bindinput="updateForm" />
+    <input class="input" placeholder="{{copy.company}}" data-field="company" value="{{form.company}}" bindinput="updateForm" />
+    <input class="input" placeholder="{{copy.projectName}}" data-field="projectName" value="{{form.projectName}}" bindinput="updateForm" />
+    <input class="input" placeholder="{{copy.contactPhone}}" type="number" maxlength="11" data-field="contactPhone" value="{{form.contactPhone}}" bindinput="updateForm" />
+  </view>
+
+  <view class="panel">
+    <view class="section-title compact">{{copy.scenario}}</view>
+    <view class="scenario-grid">
+      <view
+        wx:for="{{scenarios}}"
+        wx:key="*this"
+        class="scenario {{form.scenarioIndex === index ? 'active' : ''}}"
+        data-index="{{index}}"
+        bindtap="selectScenario"
+      >
+        {{item}}
+      </view>
+    </view>
+  </view>
+
+  <view class="panel setup-panel">
+    <view class="section-title compact">{{copy.testItemSetup}}</view>
+    <view class="muted setup-hint">{{copy.testItemSetupHint}}</view>
+    <view class="count-row">
+      <text>{{copy.testItemSetup}}</text>
+      <input class="count-input" type="number" value="{{form.testItemCount}}" bindinput="changeTestItemCount" />
+    </view>
+    <button class="add-test-btn" bindtap="addTestItem">{{copy.addTestItem}}</button>
+  </view>
+
+  <view class="section-title compact floating-title">{{copy.testItems}}</view>
+  <view wx:for="{{testItems}}" wx:for-item="testItem" wx:for-index="testIndex" wx:key="id" class="test-card panel">
+    <view class="test-head">
+      <view class="test-index">{{testIndex + 1}}</view>
+      <view class="test-main">
+        <input class="test-name" placeholder="{{copy.testItemName}}" data-test-index="{{testIndex}}" data-field="name" value="{{testItem.name}}" bindinput="updateTestItem" />
+        <view class="test-meta">
+          <text>{{copy.siteCount}}</text>
+          <input class="site-input" type="number" data-test-index="{{testIndex}}" data-field="siteCount" value="{{testItem.siteCount}}" bindinput="updateTestItem" />
+          <text>{{copy.subtotal}} {{copy.currency}}{{testItem.subtotal}}</text>
+        </view>
+      </view>
+    </view>
+
+    <view class="category-title">{{copy.categoryProgress}}</view>
+    <view class="category-strip">
+      <view
+        wx:for="{{testItem.categories}}"
+        wx:for-item="category"
+        wx:for-index="categoryIndex"
+        wx:key="id"
+        class="category-chip {{category.active ? 'active' : ''}} {{category.skipped ? 'skipped' : ''}} {{category.selectedCount > 0 ? 'done' : ''}}"
+        data-test-index="{{testIndex}}"
+        data-category-id="{{category.id}}"
+        bindtap="activateCategory"
+      >
+        <text>{{category.name}}</text>
+        <strong>{{category.statusText}}</strong>
+      </view>
+    </view>
+
+    <view wx:for="{{testItem.categories}}" wx:for-item="category" wx:for-index="categoryIndex" wx:key="id" wx:if="{{category.active}}" class="category-detail">
+      <view class="category-detail-head">
+        <view>
+          <view class="category-name">{{category.name}}</view>
+          <view class="muted">{{copy.subtotal}} {{copy.currency}}{{category.categorySubtotal}}</view>
+        </view>
+        <button class="skip-btn {{category.skipped ? 'restore' : ''}}" data-test-index="{{testIndex}}" data-category-index="{{categoryIndex}}" bindtap="toggleSkipCategory">
+          {{category.skipped ? copy.restoreCategory : copy.skipCategory}}
+        </button>
+      </view>
+
+      <view wx:if="{{category.skipped}}" class="empty-category">{{copy.skipped}}</view>
+      <view wx:else>
+        <button class="library-btn" data-test-index="{{testIndex}}" data-category-index="{{categoryIndex}}" bindtap="openProductPicker">{{copy.openProductLibrary}}</button>
+        <view class="empty-category" wx:if="{{category.selectedCount === 0}}">{{copy.emptyCategory}}</view>
+        <view class="selected-title" wx:if="{{category.selectedCount > 0}}">{{copy.selectedProducts}}</view>
+        <view wx:for="{{category.products}}" wx:for-item="product" wx:for-index="productIndex" wx:key="productId" wx:if="{{product.selected}}" class="product-card selected">
+          <view class="product-head">
+            <image class="product-thumb" src="{{product.imageUrl}}" mode="aspectFill" />
+            <view>
+              <view class="product-name">{{product.name}}</view>
+              <view class="muted">{{copy.model}} {{product.model}} {{copy.separator}} {{copy.unit}} {{product.unit}}</view>
+            </view>
+            <button class="select-btn {{product.selected ? 'checked' : ''}}" data-test-index="{{testIndex}}" data-category-index="{{categoryIndex}}" data-product-index="{{productIndex}}" bindtap="toggleProduct">
+              {{product.selected ? copy.selected : copy.select}}
+            </button>
+          </view>
+
+          <view class="product-info">
+            <view class="info-row">
+              <text>{{copy.standardPrice}}</text>
+              <strong>{{copy.currency}}{{product.standardPrice}}/{{product.unit}}</strong>
+            </view>
+            <view class="info-row quantity-row">
+              <text>{{copy.quantity}}</text>
+              <input class="qty-input" type="number" disabled="{{!product.selected}}" value="{{product.quantity}}" data-test-index="{{testIndex}}" data-category-index="{{categoryIndex}}" data-product-index="{{productIndex}}" bindinput="updateProductQuantity" />
+            </view>
+            <view class="parameter-block">
+              <view class="muted">{{copy.parameters}}</view>
+              <view class="parameter-list">
+                <text wx:for="{{product.parameters}}" wx:for-item="param" wx:key="label">{{param.label}}: {{param.value}}</text>
+              </view>
+            </view>
+            <view class="summary-text">
+              <text class="muted">{{copy.summaryText}}</text>
+              <text>{{product.summary}}</text>
+            </view>
+            <view class="product-subtotal">{{copy.subtotal}} {{copy.currency}}{{product.subtotal}}</view>
+          </view>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <view class="panel">
+    <view class="section-title compact">{{copy.template}}</view>
+    <picker range="{{templates}}" value="{{form.templateIndex}}" bindchange="selectTemplate">
+      <view class="picker-row">
+        <text>{{templates[form.templateIndex]}}</text>
+        <text>{{copy.choose}}</text>
+      </view>
+    </picker>
+    <view class="discount-row">
+      <text>{{copy.discountRate}}</text>
+      <strong>{{form.discountRate}}%</strong>
+    </view>
+    <slider min="70" max="100" step="1" value="{{form.discountRate}}" activeColor="#1677ff" backgroundColor="#d9e1ee" bindchange="changeDiscount" />
+    <textarea class="input remark" placeholder="{{copy.remark}}" data-field="remark" value="{{form.remark}}" bindinput="updateForm" />
+  </view>
+
+  <view class="panel summary-card">
+    <view class="section-title compact">{{copy.summary}}</view>
+    <view class="summary-row">
+      <text>{{copy.testItemSetup}}</text>
+      <strong>{{totals.testItemCount}}</strong>
+    </view>
+    <view class="summary-row">
+      <text>{{copy.configuredCategories}}</text>
+      <strong>{{totals.configuredCategories}}</strong>
+    </view>
+    <view class="summary-row">
+      <text>{{copy.productCount}}</text>
+      <strong>{{totals.productCount}}</strong>
+    </view>
+    <view class="summary-row">
+      <text>{{copy.originalAmount}}</text>
+      <strong>{{copy.currency}}{{totals.amount}}</strong>
+    </view>
+    <view class="summary-row">
+      <text>{{copy.finalAmount}}</text>
+      <strong class="amount">{{copy.currency}}{{totals.finalAmount}}</strong>
+    </view>
+  </view>
+
+  <view class="bottom-actions">
+    <button class="ghost-action" loading="{{submitting}}" disabled="{{submitting}}" data-status="draft" bindtap="submit">{{copy.saveDraft}}</button>
+    <button class="primary-action" loading="{{submitting}}" disabled="{{submitting}}" data-status="generated" bindtap="submit">{{copy.generate}}</button>
+  </view>
+
+  <view wx:if="{{picker.visible}}" class="picker-layer">
+    <view class="picker-mask" bindtap="closeProductPicker"></view>
+    <view class="product-picker" catchtap="noop">
+      <view class="picker-handle"></view>
+      <view class="picker-head">
+        <view>
+          <view class="picker-title">{{picker.categoryName}} {{copy.productLibrary}}</view>
+          <view class="muted picker-hint">{{copy.pickerHint}}</view>
+        </view>
+        <button class="picker-close" bindtap="closeProductPicker">{{copy.close}}</button>
+      </view>
+      <scroll-view class="picker-list" scroll-y>
+        <view
+          wx:for="{{picker.products}}"
+          wx:for-item="product"
+          wx:for-index="productIndex"
+          wx:key="productId"
+          class="picker-product {{product.selected ? 'selected' : ''}}"
+          data-test-index="{{picker.testIndex}}"
+          data-category-index="{{picker.categoryIndex}}"
+          data-product-index="{{productIndex}}"
+          bindtap="toggleProduct"
+        >
+          <image class="picker-product-img" src="{{product.imageUrl}}" mode="aspectFill" />
+          <view class="picker-product-main">
+            <view class="picker-product-top">
+              <view class="product-name">{{product.name}}</view>
+              <view class="picker-check">{{product.selected ? copy.selected : copy.select}}</view>
+            </view>
+            <view class="muted">{{copy.model}} {{product.model}} {{copy.separator}} {{copy.unit}} {{product.unit}}</view>
+            <view class="picker-summary">{{product.summary}}</view>
+            <view class="picker-price">{{copy.standardPrice}} {{copy.currency}}{{product.standardPrice}}/{{product.unit}}</view>
+          </view>
+        </view>
+      </scroll-view>
+      <button class="picker-done" bindtap="closeProductPicker">{{copy.close}}</button>
+    </view>
+  </view>
+</view>

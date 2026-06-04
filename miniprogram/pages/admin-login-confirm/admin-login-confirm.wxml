@@ -1,0 +1,27 @@
+<view class="page confirm-page">
+  <view class="panel confirm-card">
+    <view class="confirm-icon">恒</view>
+    <view class="section-title">管理后台登录确认</view>
+    <view class="muted">请确认是否允许当前微信身份登录电脑端管理后台。</view>
+
+    <view class="identity-box">
+      <view>
+        <text>当前用户</text>
+        <strong>{{user ? user.displayName : '未登录'}}</strong>
+      </view>
+      <view>
+        <text>当前角色</text>
+        <strong>{{roleLabel}}</strong>
+      </view>
+      <view>
+        <text>登录会话</text>
+        <strong>{{loginId || '无效'}}</strong>
+      </view>
+    </view>
+
+    <view class="status">{{statusText}}</view>
+
+    <button wx:if="{{!user}}" class="primary-btn" bindtap="login">微信登录</button>
+    <button wx:else class="primary-btn" loading="{{confirming}}" disabled="{{confirming}}" bindtap="confirm">确认登录后台</button>
+  </view>
+</view>

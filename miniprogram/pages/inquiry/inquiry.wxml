@@ -1,0 +1,13 @@
+<view class="page">
+  <view class="panel">
+    <view class="section-title">{{copy.title}}</view>
+    <view class="hint">{{copy.hint}}</view>
+    <input class="input" placeholder="{{copy.contactName}}" data-field="contactName" bindinput="updateField" />
+    <input class="input" placeholder="{{copy.phone}}" type="number" maxlength="11" data-field="phone" bindinput="updateField" />
+    <input class="input" placeholder="{{copy.company}}" data-field="company" bindinput="updateField" />
+    <input class="input" placeholder="{{copy.projectName}}" data-field="projectName" bindinput="updateField" />
+    <input class="input" placeholder="{{copy.projectLocation}}" data-field="projectLocation" bindinput="updateField" />
+    <textarea class="input textarea" placeholder="{{copy.requirement}}" data-field="requirement" bindinput="updateField" />
+    <button class="primary-btn submit" bindtap="submit">{{copy.submit}}</button>
+  </view>
+</view>

@@ -1,0 +1,12 @@
+{
+  "name": "product-show-miniprogram",
+  "version": "0.1.0",
+  "private": true,
+  "dependencies": {
+    "@vant/weapp": "^1.11.7"
+  },
+  "scripts": {
+    "lint": "node scripts/check-pages.mjs"
+  }
+}
+

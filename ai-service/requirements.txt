@@ -1,0 +1,10 @@
+fastapi==0.115.12
+uvicorn[standard]==0.34.2
+pydantic==2.11.5
+httpx==0.28.1
+python-multipart==0.0.20
+qdrant-client==1.14.2
+langchain==0.3.25
+langchain-community==0.3.24
+pytest==8.3.5
+

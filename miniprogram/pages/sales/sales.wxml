@@ -1,0 +1,114 @@
+<view class="page mine-page">
+  <view class="profile-card">
+    <view>
+      <view class="profile-kicker">{{isLogged ? copy.logged : copy.authPending}}</view>
+      <view class="profile-title">{{isLogged ? user.displayName : copy.title}}</view>
+      <view class="profile-role">{{isLogged ? roleLabel : copy.authPending}}</view>
+    </view>
+    <view class="role-badge">{{roleLabel}}</view>
+  </view>
+
+  <view class="panel auth-panel">
+    <view class="section-title">{{copy.title}}</view>
+    <view class="muted intro">{{copy.intro}}</view>
+    <button wx:if="{{!isLogged}}" class="primary-btn login-btn" bindtap="login">{{copy.login}}</button>
+    <button wx:else class="ghost-btn login-btn" bindtap="logout">{{copy.logout}}</button>
+    <view class="auth-tip">{{copy.authTip}}</view>
+  </view>
+
+  <view wx:if="{{!isLogged}}" class="panel empty-state">
+    <view>{{copy.emptyLogin}}</view>
+  </view>
+
+  <view wx:else>
+    <view class="metric-grid">
+      <view class="metric panel">
+        <text>{{copy.favorites}}</text>
+        <strong>{{dashboard.favoriteCount || 0}}</strong>
+      </view>
+      <view class="metric panel">
+        <text>{{copy.quoteMessages}}</text>
+        <strong>{{dashboard.quoteMessageCount || 0}}</strong>
+      </view>
+      <view class="metric panel" bindtap="goAi">
+        <text>{{copy.ai}}</text>
+        <strong>{{dashboard.aiQuestionCount || 0}}</strong>
+      </view>
+      <view class="metric panel">
+        <text>{{canQuote ? copy.quoteCenter : copy.inquiryAssign}}</text>
+        <strong>{{canQuote ? dashboard.quoteCount : dashboard.inquiryCount}}</strong>
+      </view>
+    </view>
+
+    <view class="panel">
+      <view class="section-title small-title">{{copy.favorites}}</view>
+      <view wx:if="{{favorites.length === 0}}" class="empty-mini">{{copy.emptyData}}</view>
+      <view wx:for="{{favorites}}" wx:key="id" class="simple-card">
+        <view class="item-title">{{item.name}}</view>
+        <view class="muted">{{item.model}}</view>
+        <view class="item-desc">{{item.summary}}</view>
+      </view>
+    </view>
+
+    <view class="panel">
+      <view class="section-title small-title">{{copy.quoteMessages}}</view>
+      <view wx:if="{{quoteMessages.length === 0}}" class="empty-mini">{{copy.emptyData}}</view>
+      <view wx:for="{{quoteMessages}}" wx:key="id" class="simple-card message-card">
+        <view>
+          <view class="item-title">{{item.projectName}}</view>
+          <view class="muted">{{item.sentAt}} · {{item.status}}</view>
+        </view>
+        <view class="amount">￥{{item.amount}}</view>
+      </view>
+    </view>
+
+    <view class="panel ai-panel" bindtap="goAi">
+      <view>
+        <view class="section-title small-title">{{copy.ai}}</view>
+        <view class="muted">{{copy.authTip}}</view>
+      </view>
+      <view class="action-arrow">{{copy.enter}}</view>
+    </view>
+
+    <view wx:if="{{canQuote}}" class="panel action-panel">
+      <view class="section-title small-title">{{copy.quoteCenter}}</view>
+      <view class="muted action-desc">{{canViewAllQuotes ? copy.allQuoteHint : copy.ownQuoteHint}}</view>
+      <view class="quote-action" bindtap="goQuoteCreate">
+        <view>
+          <view class="action-title">{{copy.createQuote}}</view>
+          <view class="muted action-desc">{{copy.quoteCenterHint}}</view>
+        </view>
+        <view class="action-arrow">{{copy.enter}}</view>
+      </view>
+      <view wx:if="{{quotes.length === 0}}" class="empty-mini">{{copy.emptyData}}</view>
+      <view wx:for="{{quotes}}" wx:for-index="quoteIndex" wx:key="id" class="quote-record" data-quote-index="{{quoteIndex}}" bindtap="openQuoteDetail">
+        <view>
+          <view class="item-title">{{item.projectName}}</view>
+          <view class="muted">{{item.quoteNo}} · {{item.ownerName}} · {{item.status}}</view>
+          <view class="item-desc">{{item.customerName}} · {{item.createdAt}}</view>
+        </view>
+        <view class="record-side">
+          <view class="amount">￥{{item.totalAmount}}</view>
+          <view class="detail-link">{{copy.quoteDetail}}</view>
+        </view>
+      </view>
+    </view>
+
+    <view wx:if="{{isAdmin}}" class="panel assign-panel">
+      <view class="section-title small-title">{{copy.inquiryAssign}}</view>
+      <view class="muted action-desc">{{copy.assignHint}}</view>
+      <view wx:if="{{inquiries.length === 0}}" class="empty-mini">{{copy.emptyData}}</view>
+      <view wx:for="{{inquiries}}" wx:for-index="inquiryIndex" wx:key="id" class="inquiry-card">
+        <view class="item-title">{{item.projectName}}</view>
+        <view class="muted">{{item.company}} · {{item.contactName}} · {{item.status}}</view>
+        <view class="assign-row">
+          <picker range="{{salesNames}}" value="{{item.selectedSalesIndex}}" data-inquiry-index="{{inquiryIndex}}" bindchange="selectSales">
+            <view class="assign-picker">{{salesNames[item.selectedSalesIndex]}}</view>
+          </picker>
+          <button class="assign-btn" data-inquiry-index="{{inquiryIndex}}" bindtap="assignInquiry">{{copy.assign}}</button>
+        </view>
+        <view class="item-desc">{{item.assignedSalesName}}</view>
+      </view>
+    </view>
+  </view>
+</view>

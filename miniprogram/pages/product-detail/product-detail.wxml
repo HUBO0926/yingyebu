@@ -1,0 +1,26 @@
+<view class="page" wx:if="{{product}}">
+  <image class="detail-image" src="{{product.imageUrl}}" mode="aspectFill" />
+  <view class="panel">
+    <view class="title">{{product.name}}</view>
+    <view class="muted">{{product.model}} · {{product.categoryName}}</view>
+    <view class="summary">{{product.summary}}</view>
+  </view>
+  <view class="panel">
+    <view class="section-title">{{copy.parameters}}</view>
+    <view wx:for="{{params}}" wx:key="key" class="param-row">
+      <text>{{item.key}}</text>
+      <text>{{item.value}}</text>
+    </view>
+  </view>
+  <view class="panel">
+    <view class="section-title">{{copy.attachment}}</view>
+    <view class="muted">{{copy.attachmentHint}}</view>
+  </view>
+  <view class="bottom-actions">
+    <button class="primary-btn" bindtap="goInquiry">{{copy.inquiry}}</button>
+    <button class="ghost-btn" open-type="share">{{copy.share}}</button>
+  </view>
+</view>
+<view class="page" wx:else>
+  <view class="empty">{{copy.empty}}</view>
+</view>

@@ -1,0 +1,43 @@
+<view class="page ai-page">
+  <view class="assistant-card">
+    <view class="bot-avatar">恒</view>
+    <view class="bot-main">
+      <view class="bot-line">
+        <text class="bot-name">{{copy.botName}}</text>
+        <text class="bot-badge">{{copy.status}}</text>
+      </view>
+      <view class="bot-role">{{copy.botRole}}</view>
+    </view>
+  </view>
+
+  <scroll-view class="chat-window" scroll-y scroll-with-animation scroll-into-view="{{lastMessageId}}">
+    <view wx:for="{{messages}}" wx:key="id" id="{{item.id}}" class="message-row {{item.role}}">
+      <view wx:if="{{item.role === 'assistant'}}" class="avatar small">恒</view>
+      <view class="bubble-wrap">
+        <view class="speaker">{{item.speaker}}</view>
+        <view class="bubble">{{item.content}}</view>
+      </view>
+      <view wx:if="{{item.role === 'user'}}" class="avatar small user-avatar">我</view>
+    </view>
+    <view wx:if="{{loading}}" class="message-row assistant" id="typing">
+      <view class="avatar small">恒</view>
+      <view class="bubble-wrap">
+        <view class="speaker">{{copy.botName}}</view>
+        <view class="bubble typing">
+          <text></text>
+          <text></text>
+          <text></text>
+        </view>
+      </view>
+    </view>
+  </scroll-view>
+
+  <view class="quick-panel">
+    <view wx:for="{{suggestions}}" wx:key="*this" class="quick-chip" data-question="{{item}}" bindtap="useSuggestion">{{item}}</view>
+  </view>
+
+  <view class="composer">
+    <input class="input chat-input" placeholder="{{copy.placeholder}}" value="{{question}}" confirm-type="send" bindinput="updateQuestion" bindconfirm="ask" />
+    <button class="send-btn" loading="{{loading}}" disabled="{{loading}}" bindtap="ask">{{copy.send}}</button>
+  </view>
+</view>

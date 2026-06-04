@@ -1,0 +1,58 @@
+.tabs {
+  width: 100%;
+  white-space: nowrap;
+  margin: 10rpx 0 24rpx;
+}
+
+.tab {
+  display: inline-block;
+  margin-right: 16rpx;
+  padding: 12rpx 20rpx;
+  border-radius: 8rpx;
+  color: #1677ff;
+  background: #eef5ff;
+}
+
+.tab.active {
+  color: #ffffff;
+  background: #1677ff;
+}
+
+.offline-tip {
+  margin-bottom: 20rpx;
+  padding: 16rpx 20rpx;
+  border-radius: 8rpx;
+  color: #8a6100;
+  background: #fff7df;
+  font-size: 24rpx;
+}
+
+.product {
+  display: flex;
+  gap: 20rpx;
+}
+
+.product-img {
+  flex: none;
+  width: 180rpx;
+  height: 140rpx;
+  border-radius: 10rpx;
+  background: #edf1f7;
+}
+
+.product-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.mini-title {
+  font-size: 30rpx;
+  font-weight: 700;
+}
+
+.summary {
+  margin-top: 12rpx;
+  color: #4b5b73;
+  font-size: 25rpx;
+  line-height: 1.5;
+}

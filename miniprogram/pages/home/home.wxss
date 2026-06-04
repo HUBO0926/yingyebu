@@ -1,0 +1,89 @@
+.hero {
+  min-height: 380rpx;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  color: #ffffff;
+  background: #1677ff;
+}
+
+.eyebrow,
+.title,
+.subtitle {
+  display: block;
+}
+
+.eyebrow {
+  font-size: 24rpx;
+  opacity: 0.92;
+}
+
+.title {
+  margin-top: 18rpx;
+  font-size: 44rpx;
+  line-height: 1.25;
+  font-weight: 800;
+}
+
+.subtitle {
+  margin-top: 18rpx;
+  font-size: 27rpx;
+  line-height: 1.6;
+  opacity: 0.94;
+}
+
+.hero-actions {
+  display: flex;
+  gap: 20rpx;
+}
+
+.hero-actions button {
+  flex: 1;
+}
+
+.offline-tip {
+  margin-bottom: 20rpx;
+  padding: 16rpx 20rpx;
+  border-radius: 8rpx;
+  color: #8a6100;
+  background: #fff7df;
+  font-size: 24rpx;
+}
+
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16rpx;
+}
+
+.chip {
+  padding: 12rpx 18rpx;
+  border-radius: 8rpx;
+  color: #1677ff;
+  background: #eef5ff;
+}
+
+.link {
+  color: #1677ff;
+  font-size: 26rpx;
+}
+
+.mini-card {
+  padding: 16rpx;
+  border: 1rpx solid #e5eaf3;
+  border-radius: 12rpx;
+  background: #ffffff;
+}
+
+.mini-title {
+  margin-top: 16rpx;
+  font-size: 29rpx;
+  font-weight: 700;
+}
+
+.case-summary {
+  margin-top: 10rpx;
+  color: #4b5b73;
+  font-size: 25rpx;
+  line-height: 1.55;
+}

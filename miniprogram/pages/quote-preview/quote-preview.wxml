@@ -1,0 +1,186 @@
+<view class="page preview-page">
+  <view wx:if="{{!quote}}" class="empty-state panel">
+    <view class="empty-title">{{copy.emptyTitle}}</view>
+    <view class="muted empty-desc">{{copy.emptyDesc}}</view>
+    <button class="primary-btn" bindtap="backToCreate">{{copy.backToCreate}}</button>
+  </view>
+
+  <view wx:else>
+    <view class="preview-hero">
+      <view class="hero-main">
+        <view class="hero-kicker">{{quote.quoteNo}}</view>
+        <view class="hero-title">{{copy.previewTitle}}</view>
+        <view class="hero-subtitle">{{copy.previewSubtitle}}</view>
+      </view>
+      <view class="status-pill {{quote.status === 'SENT' ? 'sent' : ''}}">{{quote.statusText}}</view>
+    </view>
+
+    <view class="panel info-panel">
+      <view class="section-title compact">{{copy.quoteInfo}}</view>
+      <view class="info-grid">
+        <view>
+          <text class="muted">报价编号</text>
+          <strong>{{quote.quoteNo}}</strong>
+        </view>
+        <view>
+          <text class="muted">生成时间</text>
+          <strong>{{quote.createdAt}}</strong>
+        </view>
+        <view>
+          <text class="muted">{{copy.template}}</text>
+          <strong>{{quote.template}}</strong>
+        </view>
+        <view>
+          <text class="muted">{{copy.discountRate}}</text>
+          <strong>{{quote.discountRate}}%</strong>
+        </view>
+      </view>
+    </view>
+
+    <view class="panel word-panel">
+      <view class="section-title compact">{{copy.wordPreview}}</view>
+      <view class="muted word-hint">{{copy.wordPreviewHint}}</view>
+      <view class="word-toolbar">
+        <view class="file-chip">{{quote.wordFileName}}</view>
+        <view class="word-badge">{{copy.wordPreviewBadge}}</view>
+      </view>
+      <view class="word-page">
+        <view class="doc-title">{{quote.project.name}}报价书</view>
+        <view class="doc-subtitle">{{quote.template}}</view>
+        <view class="doc-meta">
+          <view>
+            <text>报价编号</text>
+            <strong>{{quote.quoteNo}}</strong>
+          </view>
+          <view>
+            <text>客户单位</text>
+            <strong>{{quote.customer.company}}</strong>
+          </view>
+          <view>
+            <text>联系人</text>
+            <strong>{{quote.customer.name}}</strong>
+          </view>
+          <view>
+            <text>生成时间</text>
+            <strong>{{quote.documentDate}}</strong>
+          </view>
+        </view>
+        <view class="doc-section-title">{{copy.docProjectOverview}}</view>
+        <view class="doc-paragraph">
+          {{quote.project.name}}用于{{quote.project.scenario}}场景，本报价按{{quote.template}}生成，包含测项配置、设备明细和折扣后报价金额。
+        </view>
+        <view class="doc-section-title">{{copy.docQuoteItems}}</view>
+        <view class="doc-table">
+          <view class="doc-table-head">
+            <text>测项/类别</text>
+            <text>产品型号</text>
+            <text>数量</text>
+            <text>小计</text>
+          </view>
+          <view wx:for="{{quote.documentItems}}" wx:key="name" class="doc-table-row">
+            <text>{{item.measurement}} / {{item.categoryName}}</text>
+            <text>{{item.name}} {{item.model}}</text>
+            <text>{{item.quantity}}{{item.unit}}</text>
+            <text>{{copy.currency}}{{item.subtotal}}</text>
+          </view>
+        </view>
+        <view class="doc-section-title">{{copy.docTotal}}</view>
+        <view class="doc-total-line">
+          <text>报价原价：{{copy.currency}}{{quote.totals.amount}}</text>
+          <text>折扣率：{{quote.discountRate}}%</text>
+          <strong>折后金额：{{copy.currency}}{{quote.totals.finalAmount}}</strong>
+        </view>
+        <view class="doc-footer">{{copy.docFooter}}</view>
+      </view>
+    </view>
+
+    <view class="panel">
+      <view class="section-title compact">{{copy.customerInfo}}</view>
+      <view class="detail-row">
+        <text>{{copy.contactName}}</text>
+        <strong>{{quote.customer.name}}</strong>
+      </view>
+      <view class="detail-row">
+        <text>{{copy.company}}</text>
+        <strong>{{quote.customer.company}}</strong>
+      </view>
+      <view class="detail-row">
+        <text>{{copy.phone}}</text>
+        <strong>{{quote.customer.phone}}</strong>
+      </view>
+      <view class="detail-row">
+        <text>{{copy.projectName}}</text>
+        <strong>{{quote.project.name}}</strong>
+      </view>
+      <view class="detail-row">
+        <text>{{copy.scenario}}</text>
+        <strong>{{quote.project.scenario}}</strong>
+      </view>
+      <view class="remark-box" wx:if="{{quote.remark}}">
+        <text class="muted">{{copy.remark}}</text>
+        <view>{{quote.remark}}</view>
+      </view>
+    </view>
+
+    <view class="section-title compact floating-title">{{copy.testItems}}</view>
+    <view wx:for="{{quote.testItems}}" wx:for-item="testItem" wx:for-index="testIndex" wx:key="id" class="panel test-preview">
+      <view class="test-head">
+        <view class="test-index">{{testIndex + 1}}</view>
+        <view class="test-main">
+          <view class="test-name">{{testItem.name}}</view>
+          <view class="muted">{{copy.siteCount}} {{testItem.siteCount}} {{copy.separator}} {{copy.subtotal}} {{copy.currency}}{{testItem.subtotal}}</view>
+        </view>
+      </view>
+
+      <view wx:for="{{testItem.categories}}" wx:for-item="category" wx:key="categoryId" class="category-preview">
+        <view class="category-head">
+          <view>
+            <view class="category-name">{{category.categoryName}}</view>
+            <view class="muted" wx:if="{{category.skipped}}">{{copy.categorySkipped}}</view>
+            <view class="muted" wx:elif="{{category.selectedProducts.length === 0}}">{{copy.categoryEmpty}}</view>
+          </view>
+          <view class="category-count" wx:if="{{category.selectedProducts.length > 0}}">{{category.selectedProducts.length}} 项</view>
+        </view>
+
+        <view wx:for="{{category.selectedProducts}}" wx:for-item="product" wx:key="productId" class="product-preview">
+          <image class="product-img" src="{{product.imageUrl}}" mode="aspectFill" />
+          <view class="product-body">
+            <view class="product-name">{{product.name}}</view>
+            <view class="muted">{{copy.model}} {{product.model}} {{copy.separator}} {{copy.unit}} {{product.unit}}</view>
+            <view class="product-summary">{{product.summary}}</view>
+            <view class="product-meta">
+              <text>{{copy.standardPrice}} {{copy.currency}}{{product.standardPrice}}</text>
+              <text>{{copy.quantity}} {{product.quantity}}</text>
+              <strong>{{copy.subtotal}} {{copy.currency}}{{product.subtotal}}</strong>
+            </view>
+            <view class="parameter-list">
+              <text wx:for="{{product.parameters}}" wx:for-item="param" wx:key="label">{{param.label}}: {{param.value}}</text>
+            </view>
+          </view>
+        </view>
+      </view>
+    </view>
+
+    <view class="panel total-panel">
+      <view class="section-title compact">{{copy.totalSummary}}</view>
+      <view class="total-row">
+        <text>{{copy.originalAmount}}</text>
+        <strong>{{copy.currency}}{{quote.totals.amount}}</strong>
+      </view>
+      <view class="total-row">
+        <text>{{copy.discountRate}}</text>
+        <strong>{{quote.discountRate}}%</strong>
+      </view>
+      <view class="total-row final">
+        <text>{{copy.finalAmount}}</text>
+        <strong>{{copy.currency}}{{quote.totals.finalAmount}}</strong>
+      </view>
+    </view>
+
+    <view class="bottom-actions">
+      <button class="ghost-action" bindtap="backToCreate">{{copy.edit}}</button>
+      <button class="ghost-action" loading="{{downloading}}" disabled="{{downloading || sending}}" bindtap="downloadQuote">{{copy.download}}</button>
+      <button class="primary-action" loading="{{sending}}" disabled="{{downloading || sending}}" bindtap="sendQuote">{{copy.send}}</button>
+    </view>
+  </view>
+</view>

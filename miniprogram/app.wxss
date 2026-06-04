@@ -1,0 +1,81 @@
+page {
+  background: #f5f7fa;
+  color: #17233d;
+  font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", sans-serif;
+}
+
+.page {
+  min-height: 100vh;
+  padding: 24rpx;
+}
+
+.panel {
+  margin-bottom: 24rpx;
+  padding: 28rpx;
+  border: 1rpx solid #e5eaf3;
+  border-radius: 12rpx;
+  background: #ffffff;
+}
+
+.section-title {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin: 8rpx 0 20rpx;
+  font-size: 34rpx;
+  font-weight: 700;
+}
+
+.muted {
+  color: #79879c;
+}
+
+.primary-btn,
+.ghost-btn {
+  height: 88rpx;
+  line-height: 88rpx;
+  border-radius: 10rpx;
+  font-size: 28rpx;
+}
+
+.primary-btn {
+  color: #ffffff;
+  background: #1677ff;
+}
+
+.ghost-btn {
+  color: #1677ff;
+  background: #eef5ff;
+}
+
+.card-image {
+  width: 100%;
+  height: 260rpx;
+  display: block;
+  object-fit: cover;
+  border-radius: 10rpx;
+  background: #edf1f7;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 20rpx;
+}
+
+.input {
+  width: 100%;
+  min-height: 84rpx;
+  margin: 12rpx 0;
+  padding: 0 20rpx;
+  border: 1rpx solid #d9e1ee;
+  border-radius: 10rpx;
+  background: #ffffff;
+  box-sizing: border-box;
+}
+
+.empty {
+  padding: 56rpx 24rpx;
+  text-align: center;
+  color: #79879c;
+}

@@ -1,0 +1,88 @@
+services:
+  mysql:
+    image: mysql:8.4
+    container_name: product-show-mysql
+    environment:
+      MYSQL_DATABASE: ${MYSQL_DATABASE:-product_show}
+      MYSQL_USER: ${MYSQL_USER:-product_show}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD:-product_show_pass}
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-root_pass}
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql-data:/var/lib/mysql
+      - ./deploy/mysql:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  redis:
+    image: redis:7.4-alpine
+    container_name: product-show-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-data:/data
+
+  minio:
+    image: minio/minio:RELEASE.2026-05-24T17-08-30Z
+    container_name: product-show-minio
+    command: server /data --console-address ":9001"
+    environment:
+      MINIO_ROOT_USER: ${MINIO_ROOT_USER:-minioadmin}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD:-minioadmin}
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    volumes:
+      - minio-data:/data
+
+  backend:
+    build: ./backend
+    container_name: product-show-backend
+    depends_on:
+      mysql:
+        condition: service_healthy
+      redis:
+        condition: service_started
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/${MYSQL_DATABASE:-product_show}?useUnicode=true&characterEncoding=utf8&serverTimezone=Asia/Shanghai
+      SPRING_DATASOURCE_USERNAME: ${MYSQL_USER:-product_show}
+      SPRING_DATASOURCE_PASSWORD: ${MYSQL_PASSWORD:-product_show_pass}
+      SA_TOKEN_SECRET: ${SA_TOKEN_SECRET:-change-me-in-production}
+      WECHAT_APPID: ${WECHAT_APPID:-}
+      WECHAT_SECRET: ${WECHAT_SECRET:-}
+    ports:
+      - "8080:8080"
+    volumes:
+      - backend-uploads:/app/uploads
+
+  admin-web:
+    build: ./admin-web
+    container_name: product-show-admin
+    depends_on:
+      backend:
+        condition: service_started
+    ports:
+      - "5173:80"
+
+  ai-service:
+    build: ./ai-service
+    container_name: product-show-ai
+    environment:
+      AI_PROVIDER: ${AI_PROVIDER:-}
+      AI_CHAT_MODEL: ${AI_CHAT_MODEL:-}
+      AI_EMBEDDING_MODEL: ${AI_EMBEDDING_MODEL:-}
+      DEEPSEEK_API_KEY: ${DEEPSEEK_API_KEY:-}
+      GEMINI_API_KEY: ${GEMINI_API_KEY:-}
+      OPENAI_API_KEY: ${OPENAI_API_KEY:-}
+    ports:
+      - "8000:8000"
+
+volumes:
+  mysql-data:
+  redis-data:
+  minio-data:
+  backend-uploads:

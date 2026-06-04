@@ -1,0 +1,15 @@
+.hint {
+  margin-bottom: 18rpx;
+  color: #4b5b73;
+  font-size: 26rpx;
+  line-height: 1.6;
+}
+
+.textarea {
+  min-height: 190rpx;
+  padding-top: 20rpx;
+}
+
+.submit {
+  margin-top: 18rpx;
+}

@@ -1,0 +1,59 @@
+.confirm-page {
+  padding-top: 56rpx;
+}
+
+.confirm-card {
+  text-align: center;
+}
+
+.confirm-icon {
+  display: grid;
+  place-items: center;
+  width: 96rpx;
+  height: 96rpx;
+  margin: 0 auto 24rpx;
+  border-radius: 18rpx;
+  color: #ffffff;
+  font-size: 40rpx;
+  font-weight: 700;
+  background: #1677ff;
+}
+
+.identity-box {
+  margin: 32rpx 0;
+  padding: 22rpx;
+  border: 1rpx solid #e5eaf3;
+  border-radius: 12rpx;
+  background: #f8fbff;
+  text-align: left;
+}
+
+.identity-box view {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20rpx;
+  padding: 12rpx 0;
+  border-bottom: 1rpx solid #edf1f7;
+}
+
+.identity-box view:last-child {
+  border-bottom: 0;
+}
+
+.identity-box text {
+  color: #79879c;
+}
+
+.identity-box strong {
+  min-width: 0;
+  color: #17233d;
+  text-align: right;
+  word-break: break-all;
+}
+
+.status {
+  margin-bottom: 24rpx;
+  color: #1677ff;
+  font-weight: 700;
+}
