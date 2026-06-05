@@ -65,6 +65,8 @@ docker compose up --build -d
 
 ## 云服务器部署步骤
 
+### Ubuntu 服务器
+
 ```bash
 sudo apt update
 sudo apt install -y git ca-certificates curl
@@ -88,6 +90,27 @@ docker compose logs -f backend
 
 ```bash
 curl https://你的 API 域名/api/health
+```
+
+### Windows 服务器
+
+Windows 服务器推荐使用 WSL2 Ubuntu 承载 Docker Compose。仓库提供了一键部署脚本：
+
+```powershell
+Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass
+.\deploy\windows\install.ps1
+```
+
+也可以生成独立 zip 安装包：
+
+```powershell
+.\deploy\windows\package.ps1
+```
+
+安装包输出到：
+
+```text
+dist/product-show-windows-installer.zip
 ```
 
 ## 微信小程序体验版
