@@ -10,17 +10,18 @@ function Assert-Admin {
   $identity = [Security.Principal.WindowsIdentity]::GetCurrent()
   $principal = New-Object Security.Principal.WindowsPrincipal($identity)
   if (-not $principal.IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)) {
-    throw "请用管理员身份运行 PowerShell，然后重新执行本安装脚本。"
+    throw "Please run PowerShell as Administrator and start this installer again."
   }
 }
 
 function New-Secret([int]$Length = 32) {
   $bytes = New-Object byte[] $Length
   [Security.Cryptography.RandomNumberGenerator]::Fill($bytes)
-  return [Convert]::ToBase64String($bytes).Replace("+", "A").Replace("/", "B").Replace("=", "")
+  $value = [Convert]::ToBase64String($bytes)
+  return $value.Replace("+", "A").Replace("/", "B").Replace("=", "")
 }
 
-function Read-Value([string]$Prompt, [string]$Default = "") {
+function Read-Value([string]$Prompt, [string]$Default = "", [bool]$AllowEmpty = $false) {
   if ($Default) {
     $value = Read-Host "$Prompt [$Default]"
     if ([string]::IsNullOrWhiteSpace($value)) { return $Default }
@@ -28,6 +29,10 @@ function Read-Value([string]$Prompt, [string]$Default = "") {
   }
   do {
     $value = Read-Host $Prompt
+    if ($AllowEmpty) {
+      if ($null -eq $value) { return "" }
+      return $value.Trim()
+    }
   } while ([string]::IsNullOrWhiteSpace($value))
   return $value.Trim()
 }
@@ -39,19 +44,20 @@ function Test-Command([string]$Name) {
 Assert-Admin
 
 Write-Host ""
-Write-Host "产品展示与智能报价系统 - Windows 一键部署" -ForegroundColor Cyan
-Write-Host "本脚本会使用 WSL2 Ubuntu + Docker Compose 部署 Linux 容器。"
+Write-Host "Product Show System - Windows Installer" -ForegroundColor Cyan
+Write-Host "Deployment mode: Windows Server + WSL2 Ubuntu + Docker Compose"
 Write-Host ""
 
 if (-not (Test-Command "wsl.exe")) {
-  throw "当前系统没有 wsl.exe。请确认 Windows Server 版本支持 WSL2，或改用 Ubuntu 服务器部署。"
+  throw "wsl.exe was not found. Please use Windows Server 2022/2025 with WSL2, or deploy on Ubuntu Server."
 }
 
 $installedDistros = (wsl.exe -l -q) | ForEach-Object { $_.Trim([char]0xFEFF).Trim() } | Where-Object { $_ }
 if ($installedDistros -notcontains $Distro) {
-  Write-Host "未发现 $Distro，开始安装。安装完成后如果系统提示重启，请重启后再次运行本脚本。" -ForegroundColor Yellow
+  Write-Host "$Distro was not found. Installing WSL distribution now." -ForegroundColor Yellow
+  Write-Host "If Windows asks for a restart, restart the server and run this installer again." -ForegroundColor Yellow
   wsl.exe --install -d $Distro
-  Write-Host "WSL 安装命令已执行。如果刚才提示重启，请重启服务器后重新运行本脚本。" -ForegroundColor Yellow
+  Write-Host "WSL install command finished. Restart if required, then run this installer again." -ForegroundColor Yellow
   exit 0
 }
 
@@ -59,16 +65,16 @@ wsl.exe --set-default-version 2 | Out-Null
 try {
   wsl.exe --set-version $Distro 2 | Out-Null
 } catch {
-  Write-Host "WSL 版本设置跳过：$($_.Exception.Message)" -ForegroundColor Yellow
+  Write-Host "Skipped WSL version conversion: $($_.Exception.Message)" -ForegroundColor Yellow
 }
 
 Write-Host ""
-Write-Host "请填写部署域名和微信配置。域名必须已经解析到本服务器公网 IP。" -ForegroundColor Cyan
-$apiDomain = Read-Value "API 域名，例如 api.example.com" "api.example.com"
-$adminDomain = Read-Value "后台域名，例如 admin.example.com" "admin.example.com"
-$acmeEmail = Read-Value "证书申请邮箱" "admin@example.com"
-$wechatAppId = Read-Value "微信小程序 AppID，可先留空" ""
-$wechatSecret = Read-Value "微信小程序 AppSecret，可先留空" ""
+Write-Host "Please enter deployment settings. Domains must already point to this server public IP." -ForegroundColor Cyan
+$apiDomain = Read-Value "API domain, for example api.example.com" "api.example.com"
+$adminDomain = Read-Value "Admin domain, for example admin.example.com" "admin.example.com"
+$acmeEmail = Read-Value "TLS certificate email" "admin@example.com"
+$wechatAppId = Read-Value "WeChat Mini Program AppID, optional" "" $true
+$wechatSecret = Read-Value "WeChat Mini Program AppSecret, optional" "" $true
 
 $mysqlPassword = New-Secret 24
 $mysqlRootPassword = New-Secret 24
@@ -114,16 +120,16 @@ INSTALL_DIR="$2"
 ENV_SOURCE="$3"
 
 echo ""
-echo "==> 安装基础依赖"
+echo "==> Installing base packages"
 sudo apt-get update
 sudo apt-get install -y git ca-certificates curl
 
 if ! command -v docker >/dev/null 2>&1; then
-  echo "==> 安装 Docker Engine"
+  echo "==> Installing Docker Engine"
   curl -fsSL https://get.docker.com | sudo sh
 fi
 
-echo "==> 启动 Docker"
+echo "==> Starting Docker"
 if command -v systemctl >/dev/null 2>&1 && systemctl list-unit-files docker.service >/dev/null 2>&1; then
   sudo systemctl enable --now docker || sudo service docker start
 else
@@ -131,34 +137,37 @@ else
 fi
 
 if ! sudo docker version >/dev/null 2>&1; then
-  echo "Docker 未能正常启动。请确认 WSL2 可用，并在 Windows 防火墙/安全软件中允许 Docker。"
+  echo "Docker did not start correctly. Check WSL2 and Windows firewall/security software."
   exit 1
 fi
 
 mkdir -p "$(dirname "$INSTALL_DIR")"
 if [ -d "$INSTALL_DIR/.git" ]; then
-  echo "==> 更新代码"
+  echo "==> Updating repository"
   git -C "$INSTALL_DIR" pull --ff-only
 else
-  echo "==> 克隆代码"
+  echo "==> Cloning repository"
   git clone "$REPO_URL" "$INSTALL_DIR"
 fi
 
 cp "$ENV_SOURCE" "$INSTALL_DIR/.env"
 chmod 600 "$INSTALL_DIR/.env"
 
-echo "==> 构建并启动服务"
+echo "==> Building and starting services"
 cd "$INSTALL_DIR"
 sudo docker compose up --build -d
 
-echo "==> 容器状态"
+echo "==> Container status"
 sudo docker compose ps
 
+API_DOMAIN_VALUE="$(grep '^API_DOMAIN=' .env | cut -d= -f2)"
+ADMIN_DOMAIN_VALUE="$(grep '^ADMIN_DOMAIN=' .env | cut -d= -f2)"
+
 echo ""
-echo "部署完成。"
-echo "API 健康检查：    https://$(grep '^API_DOMAIN=' .env | cut -d= -f2)/api/health"
-echo "管理后台地址：    https://$(grep '^ADMIN_DOMAIN=' .env | cut -d= -f2)"
-echo "查看后端日志：    cd $INSTALL_DIR && sudo docker compose logs -f backend"
+echo "Deployment complete."
+echo "API health check: https://${API_DOMAIN_VALUE}/api/health"
+echo "Admin web:        https://${ADMIN_DOMAIN_VALUE}"
+echo "Backend logs:     cd $INSTALL_DIR && sudo docker compose logs -f backend"
 '@
 
 Set-Content -Path $deployScript -Value $linuxScript -Encoding UTF8
@@ -167,11 +176,11 @@ $envFileLinux = (wsl.exe -d $Distro -- wslpath -a "$envFile").Trim()
 $deployScriptLinux = (wsl.exe -d $Distro -- wslpath -a "$deployScript").Trim()
 
 Write-Host ""
-Write-Host "开始进入 WSL 部署，请等待 Docker 镜像构建完成。" -ForegroundColor Cyan
+Write-Host "Entering WSL deployment. Docker image build may take several minutes." -ForegroundColor Cyan
 wsl.exe -d $Distro -- bash "$deployScriptLinux" "$RepoUrl" "$LinuxInstallDir" "$envFileLinux"
 
 Write-Host ""
-Write-Host "Windows 防火墙提醒：" -ForegroundColor Yellow
-Write-Host "请确认云服务器安全组和 Windows 防火墙已开放 80、443。"
-Write-Host "小程序体验版 API 地址：https://$apiDomain/api"
-Write-Host "管理后台地址：https://$adminDomain"
+Write-Host "Reminder:" -ForegroundColor Yellow
+Write-Host "Open ports 80 and 443 in both cloud security group and Windows Firewall."
+Write-Host "Mini Program API: https://$apiDomain/api"
+Write-Host "Admin web:        https://$adminDomain"

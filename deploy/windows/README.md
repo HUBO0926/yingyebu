@@ -1,103 +1,110 @@
-# Windows 一键部署包
+# Windows Installer
 
-这个目录用于把系统部署到 Windows 服务器。实际运行方式是：
+This package deploys Product Show System on Windows Server by using:
 
-Windows Server -> WSL2 Ubuntu -> Docker Compose -> 项目容器。
+Windows Server -> WSL2 Ubuntu -> Docker Compose -> Linux containers.
 
-## 适用环境
+The installer text is intentionally written in English ASCII to avoid PowerShell encoding issues on Windows Server.
 
-推荐：
+## Requirements
 
-- Windows Server 2022/2025
-- 已开启虚拟化
-- 云服务器安全组开放 `80`、`443`、远程登录端口
-- 两个已解析到服务器公网 IP 的域名：
-  - `api.example.com`
-  - `admin.example.com`
+- Windows Server 2022/2025 is recommended.
+- Virtualization must be enabled by the cloud provider.
+- Cloud security group must allow `80` and `443`.
+- Windows Firewall must allow `80` and `443`.
+- Two domains must point to this server public IP:
+  - API domain, for example `api.example.com`
+  - Admin domain, for example `admin.example.com`
 
-如果可以重装系统，生产部署仍优先推荐 Ubuntu Server 22.04/24.04。
+If you can reinstall the server OS, Ubuntu Server 22.04/24.04 is still the simplest production option.
 
-## 使用方式
+## Important Upgrade Note
 
-1. 将 `install.ps1` 上传到 Windows 服务器。
-2. 右键 PowerShell，选择“以管理员身份运行”。
-3. 右键 `start-installer.cmd`，选择“以管理员身份运行”。
+If an older installer failed with `ParserError`, delete the old extracted folder first:
 
-如果 Windows 拦截脚本执行，也可以进入脚本所在目录后手动执行：
+```text
+C:\Users\Administrator\Desktop\product-show-windows-installer
+```
+
+Then extract the new zip package again.
+
+## How To Run
+
+1. Extract `product-show-windows-installer.zip` on the Windows server.
+2. Right-click `start-installer.cmd`.
+3. Choose "Run as administrator".
+4. Follow the prompts.
+
+If Windows blocks script execution, open PowerShell as Administrator in this folder and run:
 
 ```powershell
 Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass
 .\install.ps1
 ```
 
-脚本会自动：
+The installer will:
 
-- 检查 WSL2。
-- 安装或使用 `Ubuntu-22.04`。
-- 在 WSL Ubuntu 内安装 Git 和 Docker。
-- 从 GitHub 拉取 `HUBO0926/yingyebu`。
-- 生成服务器 `.env`。
-- 执行 `docker compose up --build -d`。
-- 输出 API 和后台访问地址。
+- Check WSL2.
+- Install or reuse `Ubuntu-22.04`.
+- Install Git and Docker inside WSL Ubuntu.
+- Clone `HUBO0926/yingyebu`.
+- Generate server `.env`.
+- Run `docker compose up --build -d`.
+- Print API and admin URLs.
 
-如果安装 WSL 后提示重启，请重启服务器后再次运行 `install.ps1`。
+If WSL asks for a restart, restart the server and run `start-installer.cmd` again.
 
-## 生成 zip 安装包
+## Build The Zip Package
 
-在本地仓库根目录执行：
+From the repository root:
 
 ```powershell
 .\deploy\windows\package.ps1
 ```
 
-生成：
+Output:
 
 ```text
 dist/product-show-windows-installer.zip
 ```
 
-## 部署后的常用命令
+## Useful Commands After Deployment
 
-进入 WSL：
+Enter WSL:
 
 ```powershell
 wsl -d Ubuntu-22.04
 ```
 
-进入项目目录：
+Open project directory:
 
 ```bash
 cd ~/product-show-system
 ```
 
-查看容器：
+Show containers:
 
 ```bash
 sudo docker compose ps
 ```
 
-查看后端日志：
+View backend logs:
 
 ```bash
 sudo docker compose logs -f backend
 ```
 
-重启服务：
+Restart services:
 
 ```bash
 sudo docker compose restart
 ```
 
-更新代码：
+Update deployment:
 
 ```bash
 git pull
 sudo docker compose up --build -d
 ```
 
-## 注意事项
-
-- 不要执行 `docker compose down -v`，这会删除 MySQL 数据卷。
-- `.env` 只保存在服务器，不要提交到 Git。
-- 微信小程序体验版必须使用 HTTPS API 域名。
-- Windows 防火墙和云安全组都要放行 `80`、`443`。
+Do not run `docker compose down -v` on production. It deletes MySQL data volumes.
