@@ -114,11 +114,7 @@ public class ApiController {
         salesService.permissionsForRole(currentRole()),
         currentOpenId()
     );
-    return ApiResponse.ok(Map.of(
-        "status", session.status(),
-        "role", session.role(),
-        "displayName", session.displayName()
-    ));
+    return ApiResponse.ok(Map.of("status", session.status(), "role", session.role(), "displayName", session.displayName()));
   }
 
   @GetMapping("/catalog/home")

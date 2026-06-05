@@ -2,7 +2,7 @@ App({
   globalData: {
     localApiBase: 'http://localhost:8080/api',
     releaseApiBase: 'https://api.example.com/api',
-    apiBase: 'http://localhost:8080/api',
+    apiBase: 'https://api.example.com/api',
     token: '',
     currentUser: null,
     pendingQuotePreview: null,
